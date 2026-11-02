@@ -1,0 +1,8 @@
+{
+  "id": "custom-tada-mode",
+  "name": "Custom TADA Mode",
+  "author": "Magnum Mods",
+  "version": "1.0.0",
+  "loader": "1.3.0",
+  "priority": 0
+}
