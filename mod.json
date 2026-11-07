@@ -1,4 +1,5 @@
 {
+  "$schema": "https://rq-modding.github.io/rq-modding-docs/schemas/mod.schema.json",
   "id": "custom-tada-mode",
   "name": "Custom TADA Mode",
   "author": "Magnum Mods",
