@@ -1,10 +1,12 @@
 -- Custom TADA Mode. TADA mode (◆２倍モード) doubles battle EXP, battle gold and
--- familiar growth with a hard-coded 2. This mod reads the multiplier from
--- config.ini in its folder at start and writes it in place of those three 2s.
+-- familiar growth with a hard-coded 2. This mod writes its own multiplier in place of
+-- those three 2s, and its page in Config's Mods tab changes it with no restart.
+-- API reference: https://rq-modding.github.io/rq-modding-docs/reference/
 
-local CONFIG = "config.ini"
 local DEFAULT = 2
 local MIN, MAX = 1, 100
+local KEY = "multiplier"
+local OLD_CONFIG = "config.ini" -- 1.0.0's file, read once to carry a player's number over
 
 -- The 2s that TADA mode multiplies by. Each is the first 2 right after a read of the
 -- flag, so they are found by that read (0-based, per function), not by a count of
@@ -16,21 +18,14 @@ local SPOTS = {
   { what = "familiar growth", fn = "Ｔ戦闘前初期化", ref = 0 },        -- ra *= 2
 }
 
-local NOTE_MS = 15000
-
-local note
-
-local function warn(text)
-  rq.log("Custom TADA Mode: " .. text)
-  note = "Custom TADA Mode: " .. text
+local function valid(n)
+  return math.type(n) == "integer" and n >= MIN and n <= MAX
 end
 
--- Returns the multiplier, or nil and why it could not be read.
-local function read_multiplier()
-  local f = io.open(CONFIG, "rb")
-  if not f then
-    return nil, CONFIG .. " was not found"
-  end
+-- 1.0.0 kept the number in config.ini; the first start of 1.1.0 takes it from there.
+local function from_old_file()
+  local f = io.open(OLD_CONFIG, "rb")
+  if not f then return nil end
   local text = f:read("a")
   f:close()
   local raw
@@ -38,47 +33,76 @@ local function read_multiplier()
     local value = line:match("^%s*multiplier%s*=%s*(.-)%s*$")
     if value then raw = value end
   end
-  if raw == nil then
-    return nil, "no 'multiplier = ...' line in " .. CONFIG
-  end
-  local n = tonumber(raw)
-  if not n or n ~= math.floor(n) or n < MIN or n > MAX then
-    return nil, "multiplier '" .. raw .. "' is not a whole number from " .. MIN .. " to " .. MAX
-  end
-  return math.tointeger(n)
+  local n = raw and math.tointeger(tonumber(raw))
+  return valid(n) and n or nil
 end
 
-local mult, why = read_multiplier()
-if not mult then
-  warn(why .. ", using " .. DEFAULT .. "x")
-  mult = DEFAULT
+local mult = rq.store.global.get(KEY)
+if not valid(mult) then
+  mult = from_old_file() or DEFAULT
+  rq.store.global.set(KEY, mult)
 end
 
-if mult ~= DEFAULT then
-  for _, s in ipairs(SPOTS) do
-    local hit = rq.ain.patch_int_after(s.fn, FLAG, DEFAULT, mult, s.ref)
-    if hit ~= 1 then
-      warn("could not change " .. s.what .. " (the game's code is not as expected)")
-    end
+-- The places are found once, from the game's 2: a later change writes there, so the
+-- comparison's 1 in `if (◆２倍モード == 1)` is never taken for the multiplier.
+local places, missing = {}, {}
+for _, s in ipairs(SPOTS) do
+  local hit, at = rq.ain.patch_int_after(s.fn, FLAG, DEFAULT, mult, s.ref)
+  if hit == 1 and at and at[1] then
+    places[#places + 1] = at[1]
+  else
+    missing[#missing + 1] = s.what
+    rq.log("Custom TADA Mode: could not find " .. s.what .. " (the game's code is not as expected)")
   end
+end
+
+local function set_mult(n)
+  mult = n
+  rq.store.global.set(KEY, n)
+  for _, p in ipairs(places) do
+    if not rq.ain.set_code_int(p, n) then rq.log("Custom TADA Mode: a place moved; restart the game") end
+  end
+  rq.log("Custom TADA Mode: TADA mode multiplier is " .. n .. "x")
 end
 
 rq.log("Custom TADA Mode: TADA mode multiplier is " .. mult .. "x")
 
--- A warning stays on screen for a while after the game starts.
-if note then
-  local shown_at
-  local stop
-  stop = rq.on_frame(function()
-    local now = rq.time_ms()
-    shown_at = shown_at or now
-    if now - shown_at > NOTE_MS then
-      stop()
+rq.config.page{
+  id = "custom-tada-mode",
+  title = "Custom TADA Mode",
+  draw = function(ui)
+    local broken = #missing > 0
+    local v, changed = ui.stepper(mult, { id = "multiplier", label = "TADA mode multiplier", min = MIN, max = MAX,
+      disabled = broken, tip = "What TADA mode multiplies by. The game's own is 2." })
+    if changed then set_mult(v) end
+    ui.space(0, 4)
+    if broken then
+      ui.label("Not found in the game's code: " .. table.concat(missing, ", ") .. ".", { color = { 255, 140, 120 } })
+      ui.label("This version of the game is not the one the mod knows.", { dim = true, size = 15 })
       return
     end
-    local w = rq.hud.screen()
-    local tw = rq.hud.text_width(note, 18)
-    rq.hud.rect((w - tw) // 2 - 10, 8, tw + 20, 28, 0, 0, 0, 170)
-    rq.hud.text((w - tw) // 2, 12, note, { size = 18, r = 255, g = 210, b = 90 })
-  end)
-end
+    ui.label("It multiplies battle EXP, battle gold and familiar growth.", { dim = true, size = 15 })
+    ui.label("A change counts from the next fight; no restart.", { dim = true, size = 15 })
+    ui.space(0, 8)
+    local on = rq.ain.global(FLAG)
+    if on == nil then
+      ui.label("Load a save to see whether TADA mode is on in it.", { dim = true, size = 15 })
+    else
+      ui.label("TADA mode in the loaded save: " .. (on == 1 and "on" or "off"), { size = 16 })
+    end
+  end,
+}
+
+-- For the Lab: the multiplier and the places' values.
+return {
+  multiplier = function() return mult end,
+  set = function(n)
+    if not valid(n) then error("custom-tada-mode: the multiplier is a whole number from " .. MIN .. " to " .. MAX, 2) end
+    set_mult(n)
+  end,
+  places = function()
+    local out = {}
+    for i, p in ipairs(places) do out[i] = rq.ain.code_int(p) end
+    return out
+  end,
+}
