@@ -3,6 +3,11 @@
 Each section is a version of the mod, the `version` in `mod.json`. The release workflow copies the
 section of a tagged version into the release notes.
 
+## 1.1.1
+
+- The Config page is built with the loader's `rq.config.settings`: the same number field, kept under
+  the same key, and a **Reset** button that puts back 2. Needs loader 2.35.0.
+
 ## 1.1.0
 
 - The multiplier is on the mod's page in Config's Mods tab, a number field from 1 to 100, and a

@@ -5,16 +5,17 @@ For people and agents who test the mod in the game. Check `logs\rqmod.log` for
 
 ## What it adds
 
-A page in Config's Mods tab, **Custom TADA Mode**, with one number field (`rq.uikit.stepper`, loader
-2.22.0). In `rqmod-ctl ui`, on that page:
+A page in Config's Mods tab, **Custom TADA Mode**, with one number field and a Reset button (built
+with `rq.config.settings`, loader 2.35.0). In `rqmod-ctl ui`, on that page:
 
 | Control | What it is |
 | --- | --- |
 | `stepper-multiplier` | The multiplier; its `value` is the number, `selected` while it is typed into. |
 | `button-multiplier-dec`, `button-multiplier-inc` | - and +. |
+| `button-reset` | Puts back 2. Not there when the game's code was not found. |
 
 Type a number: `press stepper-multiplier`, then `type 5` and `key enter` (`key esc` puts the old one
-back). No other buttons or `rq.agent.control` ids. Do not invent controls.
+back). No other `rq.agent.control` ids. Do not invent controls.
 
 ## How to check it
 

@@ -56,9 +56,10 @@ for _, s in ipairs(SPOTS) do
   end
 end
 
-local function set_mult(n)
+-- Writes the number where the game's 2s were. Called by the page's on_change: the page, Reset and
+-- the Lab's set all go through it.
+local function apply(n)
   mult = n
-  rq.store.global.set(KEY, n)
   for _, p in ipairs(places) do
     if not rq.ain.set_code_int(p, n) then rq.log("Custom TADA Mode: a place moved; restart the game") end
   end
@@ -67,23 +68,25 @@ end
 
 rq.log("Custom TADA Mode: TADA mode multiplier is " .. mult .. "x")
 
-rq.config.page{
+-- The page is the loader's rq.config.settings (1.1.1), on the same key in rq.store.global. While the
+-- game's code is not as expected the field is greyed and there is no Reset.
+local settings = rq.config.settings{
   id = "custom-tada-mode",
   title = "Custom TADA Mode",
+  reset = #missing == 0,
+  rows = {
+    { kind = "stepper", key = KEY, id = "multiplier", label = "TADA mode multiplier", min = MIN, max = MAX,
+      default = DEFAULT, disabled = #missing > 0, tip = "What TADA mode multiplies by. The game's own is 2.",
+      note = { "It multiplies battle EXP, battle gold and familiar growth.",
+        "A change counts from the next fight; no restart." } },
+  },
   draw = function(ui)
-    local broken = #missing > 0
-    local v, changed = ui.stepper(mult, { id = "multiplier", label = "TADA mode multiplier", min = MIN, max = MAX,
-      disabled = broken, tip = "What TADA mode multiplies by. The game's own is 2." })
-    if changed then set_mult(v) end
-    ui.space(0, 4)
-    if broken then
+    ui.space(0, 8)
+    if #missing > 0 then
       ui.label("Not found in the game's code: " .. table.concat(missing, ", ") .. ".", { color = { 255, 140, 120 } })
       ui.label("This version of the game is not the one the mod knows.", { dim = true, size = 15 })
       return
     end
-    ui.label("It multiplies battle EXP, battle gold and familiar growth.", { dim = true, size = 15 })
-    ui.label("A change counts from the next fight; no restart.", { dim = true, size = 15 })
-    ui.space(0, 8)
     local on = rq.ain.global(FLAG)
     if on == nil then
       ui.label("Load a save to see whether TADA mode is on in it.", { dim = true, size = 15 })
@@ -92,13 +95,14 @@ rq.config.page{
     end
   end,
 }
+settings.on_change(function(_, n) apply(n) end)
 
 -- For the Lab: the multiplier and the places' values.
 return {
   multiplier = function() return mult end,
   set = function(n)
     if not valid(n) then error("custom-tada-mode: the multiplier is a whole number from " .. MIN .. " to " .. MAX, 2) end
-    set_mult(n)
+    settings.set(KEY, n)
   end,
   places = function()
     local out = {}
