@@ -3,6 +3,11 @@
 Each section is a version of the mod, the `version` in `mod.json`. The release workflow copies the
 section of a tagged version into the release notes.
 
+## 1.1.2
+
+- The page reads TADA mode with the loader's `rq.game.mode()` instead of the game's flag. Needs loader
+  2.36.0. No change in the game.
+
 ## 1.1.1
 
 - The Config page is built with the loader's `rq.config.settings`: the same number field, kept under

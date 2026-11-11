@@ -87,11 +87,11 @@ local settings = rq.config.settings{
       ui.label("This version of the game is not the one the mod knows.", { dim = true, size = 15 })
       return
     end
-    local on = rq.ain.global(FLAG)
-    if on == nil then
+    local mode = rq.game.mode()
+    if mode == nil then
       ui.label("Load a save to see whether TADA mode is on in it.", { dim = true, size = 15 })
     else
-      ui.label("TADA mode in the loaded save: " .. (on == 1 and "on" or "off"), { size = 16 })
+      ui.label("TADA mode in the loaded save: " .. (mode == "tada" and "on" or "off"), { size = 16 })
     end
   end,
 }

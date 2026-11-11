@@ -36,7 +36,7 @@ Only what you earn: gold, EXP and familiar growth stay in the save as usual.
 
 ## Install
 
-Needs [RQ MOD](https://github.com/RQ-Modding/RQ-Mod) with loader **2.35.0** or newer. Extract the
+Needs [RQ MOD](https://github.com/RQ-Modding/RQ-Mod) with loader **2.36.0** or newer. Extract the
 release zip into the game's `mods` folder, so that you have `mods/custom-tada-mode/mod.json`.
 
 ## How it works
