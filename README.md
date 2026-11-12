@@ -1,10 +1,11 @@
 # Custom TADA Mode
 
-Sets how many times **TADA mode** multiplies rewards. The game's own value is 2.
+Sets how many times **TADA mode** multiplies rewards: battle gold, battle EXP and familiar growth,
+each with its own number. The game's own value is 2 for all three.
 
 ## What it changes
 
-While TADA mode is on, these use your multiplier instead of 2:
+While TADA mode is on, each of these uses its own multiplier instead of 2:
 
 - battle gold,
 - battle EXP (before the party size and quest bonuses),
@@ -15,18 +16,19 @@ TADA mode itself is still chosen in the game, as before. The game's texts that c
 
 ## Keys and settings
 
-The multiplier is on the mod's page in Config's **Mods** tab: **Custom TADA Mode**, a number from 1
-to 100 (the game's own is 2).
+The multipliers are on the mod's page in Config's **Mods** tab: **Custom TADA Mode**, three numbers
+from 1 to 100 (the game's own is 2 for each): **Battle gold**, **Battle EXP** and **Familiar growth**.
 
-- Change it with **-** and **+** (Shift for 10 at a time), the mouse wheel over it, or a click on the
+- Change one with **-** and **+** (Shift for 10 at a time), the mouse wheel over it, or a click on the
   number to type it, then Enter (Esc puts the old number back).
-- It counts from the next fight; no restart.
-- `1` makes TADA mode give the same as Classic mode.
-- **Reset** puts back 2.
+- A change counts from the next fight; no restart.
+- `1` makes that reward the same as in Classic mode.
+- **Reset** puts back 2 for all three.
 - The page also says whether TADA mode is on in the loaded save.
 
-The number is kept for every save. Version 1.0.0's `config.ini` is read once, on the first start of
-1.1.0, so your number carries over; the file is no longer used after that and can be deleted.
+The numbers are kept for every save. Version 1.1 had one number for the three: the first start of
+1.2.0 gives it to each. Version 1.0.0's `config.ini` is read once if neither is there; the file is
+no longer used after that and can be deleted.
 
 Only whole numbers are possible: the game multiplies whole numbers by a whole number in its own
 code, and the mod changes that number.
@@ -50,8 +52,8 @@ release zip into the game's `mods` folder, so that you have `mods/custom-tada-mo
 Each 2 is found as the first 2 after the game reads `◆２倍モード`, with `rq.ain.patch_int_after`, so
 it does not depend on how many other 2s the function has. The mod finds the three places once, at
 start, from the game's 2; a change on the page writes the new number into them with
-`rq.ain.set_code_int`, so the `1` of `if (◆２倍モード == 1)` is never taken for the multiplier. If one
-of the three is not found, the page says which and its number is greyed.
+`rq.ain.set_code_int`, so the `1` of `if (◆２倍モード == 1)` is never taken for a multiplier. If one
+of the three is not found, the page says which and only its number is greyed.
 
 ## License
 

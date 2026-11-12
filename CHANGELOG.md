@@ -3,6 +3,14 @@
 Each section is a version of the mod, the `version` in `mod.json`. The release workflow copies the
 section of a tagged version into the release notes.
 
+## 1.2.0
+
+- One multiplier for each thing TADA mode changes: battle gold, battle EXP and familiar growth, each
+  a number from 1 to 100 on the Mods tab page (the game's own is 2 for all three).
+- The first start of 1.2.0 gives the one number of 1.1 to each of the three, so your setting carries
+  over.
+- If the game's code lacks one of the three places, only that row is greyed.
+
 ## 1.1.2
 
 - The page reads TADA mode with the loader's `rq.game.mode()` instead of the game's flag. Needs loader

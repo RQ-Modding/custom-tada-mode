@@ -3,7 +3,7 @@
   "id": "custom-tada-mode",
   "name": "Custom TADA Mode",
   "author": "Moru Zerinho6",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "loader": "2.36.0",
   "priority": 0
 }
