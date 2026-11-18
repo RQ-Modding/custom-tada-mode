@@ -36,8 +36,8 @@ the gold's with none), `multipliers()`, `set(n)` for all three or `set(what, n)`
 page), and `places()`, the three numbers now in the game's code (battle gold, battle EXP, familiar
 growth).
 
-## Test Lab
+## Tested in the game
 
-`test-lab/scenarios/config-pages.lua`: the page, the three fields, a set through `rqmod-ctl`-style
-keys, and the three places in the game's code at each step. `tada-fight.lua`: real fights with the
+The Test Lab's scenario `config-pages`: the page, the three fields, a set through `rqmod-ctl`-style
+keys, and the three places in the game's code at each step. `tada-fight`: real fights with the
 three multipliers apart (gold, EXP and the familiar's growth each follow their own).
