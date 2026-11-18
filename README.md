@@ -3,6 +3,10 @@
 Sets how many times **TADA mode** multiplies rewards: battle gold, battle EXP and familiar growth,
 each with its own number. The game's own value is 2 for all three.
 
+## Showcase
+
+<img width="1270" height="910" alt="image" src="https://github.com/user-attachments/assets/5360c345-98f6-4cb8-8e3a-76af0d0cfc8f" />
+
 ## What it changes
 
 While TADA mode is on, each of these uses its own multiplier instead of 2:
